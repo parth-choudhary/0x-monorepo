@@ -18,9 +18,9 @@
 
 pragma solidity ^0.4.11;
 
-import { UnlimitedAllowanceToken_v1 as UnlimitedAllowanceToken } from "../../../previous/UnlimitedAllowanceToken/UnlimitedAllowanceToken_v1.sol";
+import "../../../previous/UnlimitedAllowanceToken/UnlimitedAllowanceToken_v1.sol";
 
-contract ZRXToken is UnlimitedAllowanceToken {
+contract ZRXToken is UnlimitedAllowanceToken_v1 {
 
     uint8 constant public decimals = 18;
     uint public totalSupply = 10**27; // 1 billion tokens, 18 decimal places

@@ -18,7 +18,7 @@
 
 pragma solidity ^0.4.19;
 
-import { SafeMath } from "../../utils/SafeMath/SafeMath.sol";
+import "../../utils/SafeMath/SafeMath.sol";
 
 contract LibPartialAmount is SafeMath {
   

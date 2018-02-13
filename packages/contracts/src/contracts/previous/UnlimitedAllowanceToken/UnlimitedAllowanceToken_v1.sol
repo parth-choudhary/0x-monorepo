@@ -18,9 +18,9 @@
 
 pragma solidity ^0.4.11;
 
-import { ERC20Token_v1 as ERC20Token } from "../ERC20Token/ERC20Token_v1.sol";
+import "../ERC20Token/ERC20Token_v1.sol";
 
-contract UnlimitedAllowanceToken_v1 is ERC20Token {
+contract UnlimitedAllowanceToken_v1 is ERC20Token_v1 {
 
     uint constant MAX_UINT = 2**256 - 1;
 

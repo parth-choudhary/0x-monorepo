@@ -18,7 +18,7 @@
 
 pragma solidity ^0.4.18;
 
-import { ERC20Token } from "../ERC20Token/ERC20Token.sol";
+import "../ERC20Token/ERC20Token.sol";
 
 contract UnlimitedAllowanceToken is ERC20Token {
 

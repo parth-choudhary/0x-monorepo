@@ -145,7 +145,11 @@ export class Compiler {
         }
 
         const source = this._contractSourcesIfExists[contractBaseName];
-        const contractName = path.basename(contractBaseName, SOLIDITY_FILE_EXTENSION);
+        let contractName = path.basename(contractBaseName, SOLIDITY_FILE_EXTENSION);
+        if (_.endsWith(contractName, 'combined')) {
+            const contractWords = contractName.split('.');
+            contractName = contractWords[contractWords.length - 2];
+        }
         const currentArtifactPath = `${this._artifactsDir}/${contractName}.json`;
         const sourceHash = `0x${ethUtil.sha3(source).toString('hex')}`;
 

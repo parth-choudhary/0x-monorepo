@@ -18,13 +18,13 @@
 
 pragma solidity ^0.4.14;
 
-import { TokenTransferProxy_v1 as TokenTransferProxy } from "../TokenTransferProxy/TokenTransferProxy_v1.sol";
-import { Token_v1 as Token } from "../Token/Token_v1.sol";
-import { SafeMath_v1 as SafeMath } from "../SafeMath/SafeMath_v1.sol";
+import "../TokenTransferProxy/TokenTransferProxy_v1.sol";
+import "../Token/Token_v1.sol";
+import "../SafeMath/SafeMath_v1.sol";
 
 /// @title Exchange - Facilitates exchange of ERC20 tokens.
 /// @author Amir Bandeali - <amir@0xProject.com>, Will Warren - <will@0xProject.com>
-contract Exchange_v1 is SafeMath {
+contract Exchange_v1 is SafeMath_v1 {
 
     // Error Codes
     enum Errors {
@@ -532,7 +532,7 @@ contract Exchange_v1 is SafeMath {
         internal
         returns (bool)
     {
-        return TokenTransferProxy(TOKEN_TRANSFER_PROXY_CONTRACT).transferFrom(token, from, to, value);
+        return TokenTransferProxy_v1(TOKEN_TRANSFER_PROXY_CONTRACT).transferFrom(token, from, to, value);
     }
 
     /// @dev Checks if any order transfers will fail.
@@ -585,7 +585,7 @@ contract Exchange_v1 is SafeMath {
         constant  // The called token contract may attempt to change state, but will not be able to due to an added gas limit.
         returns (uint)
     {
-        return Token(token).balanceOf.gas(EXTERNAL_QUERY_GAS_LIMIT)(owner); // Limit gas to prevent reentrancy
+        return Token_v1(token).balanceOf.gas(EXTERNAL_QUERY_GAS_LIMIT)(owner); // Limit gas to prevent reentrancy
     }
 
     /// @dev Get allowance of token given to TokenTransferProxy by an address.
@@ -597,6 +597,6 @@ contract Exchange_v1 is SafeMath {
         constant  // The called token contract may attempt to change state, but will not be able to due to an added gas limit.
         returns (uint)
     {
-        return Token(token).allowance.gas(EXTERNAL_QUERY_GAS_LIMIT)(owner, TOKEN_TRANSFER_PROXY_CONTRACT); // Limit gas to prevent reentrancy
+        return Token_v1(token).allowance.gas(EXTERNAL_QUERY_GAS_LIMIT)(owner, TOKEN_TRANSFER_PROXY_CONTRACT); // Limit gas to prevent reentrancy
     }
 }

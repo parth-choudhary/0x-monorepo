@@ -18,12 +18,12 @@
 
 pragma solidity ^0.4.11;
 
-import { Token_v1 as Token } from "../Token/Token_v1.sol";
-import { Ownable_v1 as Ownable } from "../Ownable/Ownable_v1.sol";
+import "../Token/Token_v1.sol";
+import "../Ownable/Ownable_v1.sol";
 
 /// @title TokenTransferProxy - Transfers tokens on behalf of contracts that have been approved via decentralized governance.
 /// @author Amir Bandeali - <amir@0xProject.com>, Will Warren - <will@0xProject.com>
-contract TokenTransferProxy_v1 is Ownable {
+contract TokenTransferProxy_v1 is Ownable_v1 {
 
     /// @dev Only authorized addresses can invoke functions with this modifier.
     modifier onlyAuthorized {
@@ -96,7 +96,7 @@ contract TokenTransferProxy_v1 is Ownable {
         onlyAuthorized
         returns (bool)
     {
-        return Token(token).transferFrom(from, to, value);
+        return Token_v1(token).transferFrom(from, to, value);
     }
 
     /*

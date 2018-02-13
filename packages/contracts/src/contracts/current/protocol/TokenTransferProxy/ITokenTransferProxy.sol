@@ -18,11 +18,11 @@
 
 pragma solidity ^0.4.19;
 
-import { IOwnable_v1 as IOwnable } from "../../../previous/Ownable/IOwnable_v1.sol";
+import "../../../previous/Ownable/IOwnable_v1.sol";
 
 /// @title TokenTransferProxy - Transfers tokens on behalf of contracts that have been approved via decentralized governance.
 /// @author Amir Bandeali - <amir@0xProject.com>, Will Warren - <will@0xProject.com>
-contract ITokenTransferProxy is IOwnable {
+contract ITokenTransferProxy is IOwnable_v1 {
   
     function authorized(address addr)
         public view

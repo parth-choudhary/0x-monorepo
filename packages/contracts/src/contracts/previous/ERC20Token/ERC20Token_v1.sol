@@ -1,8 +1,8 @@
 pragma solidity ^0.4.11;
 
-import { Token_v1 as Token } from "../Token/Token_v1.sol";
+import "../Token/Token_v1.sol";
 
-contract ERC20Token_v1 is Token {
+contract ERC20Token_v1 is Token_v1 {
 
     function transfer(address _to, uint _value) returns (bool) {
         //Default assumes totalSupply can't be over max (2^256 - 1).
