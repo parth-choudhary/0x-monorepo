@@ -14,6 +14,7 @@ const DEFAULT_ARTIFACTS_DIR = path.resolve('artifacts');
 const DEFAULT_NETWORK_ID = 50;
 const DEFAULT_JSONRPC_PORT = 8545;
 const DEFAULT_GAS_PRICE = (10 ** 9 * 2).toString();
+const DEFAULT_COMPILE_CONTRACTS = '*';
 
 /**
  * Compiles all contracts with options passed in through CLI.
@@ -25,6 +26,7 @@ async function onCompileCommand(argv: CliOptions): Promise<void> {
         networkId: argv.networkId,
         optimizerEnabled: argv.shouldOptimize ? 1 : 0,
         artifactsDir: argv.artifactsDir,
+        contractsToCompile: generateContractsToCompileSet(argv.contracts),
     };
     await commands.compileAsync(opts);
 }
@@ -43,6 +45,7 @@ async function onMigrateCommand(argv: CliOptions): Promise<void> {
         networkId,
         optimizerEnabled: argv.shouldOptimize ? 1 : 0,
         artifactsDir: argv.artifactsDir,
+        contractsToCompile: generateContractsToCompileSet(argv.contracts),
     };
     await commands.compileAsync(compilerOpts);
 
@@ -72,6 +75,7 @@ async function onDeployCommand(argv: CliOptions): Promise<void> {
         networkId,
         optimizerEnabled: argv.shouldOptimize ? 1 : 0,
         artifactsDir: argv.artifactsDir,
+        contractsToCompile: generateContractsToCompileSet(argv.contracts),
     };
     await commands.compileAsync(compilerOpts);
 
@@ -90,6 +94,18 @@ async function onDeployCommand(argv: CliOptions): Promise<void> {
     await commands.deployAsync(argv.contract, deployerArgs, deployerOpts);
 }
 /**
+ * Creates a set of contracts to compile.
+ * @param contracts Comma separated list of contracts to compile
+ */
+function generateContractsToCompileSet(contracts: string): Set<string> {
+    const contractsToCompile = new Set();
+    const contractsArray = contracts.split(',');
+    _.forEach(contracts, contractName => {
+        contractsToCompile.add(contractName);
+    });
+    return contractsToCompile;
+}
+/**
  * Provides extra required options for deploy command.
  * @param yargsInstance yargs instance provided in builder function callback.
  */
@@ -104,6 +120,19 @@ function deployCommandBuilder(yargsInstance: any) {
             description: 'comma separated list of constructor args to deploy contract with',
         })
         .demandOption(['contract', 'args'])
+        .help().argv;
+}
+/**
+ * Provides extra options for compile command.
+ * @param yargsInstance yargs instance provided in builder function callback.
+ */
+function compileCommandBuilder(yargsInstance: any) {
+    return yargsInstance
+        .option('contracts', {
+            type: 'string',
+            default: DEFAULT_COMPILE_CONTRACTS,
+            description: 'comma separated list of contracts to compile',
+        })
         .help().argv;
 }
 
@@ -144,7 +173,7 @@ function deployCommandBuilder(yargsInstance: any) {
             type: 'string',
             description: 'account to use for deploying contracts',
         })
-        .command('compile', 'compile contracts', identityCommandBuilder, onCompileCommand)
+        .command('compile', 'compile contracts', compileCommandBuilder, onCompileCommand)
         .command(
             'migrate',
             'compile and deploy contracts using migration scripts',
