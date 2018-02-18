@@ -104,15 +104,15 @@ contract Exchange is SafeMath {
     /// @param s ECDSA signature parameters s.
     /// @return Total amount of takerToken filled in trade.
     function fillOrder(
-          address[5] orderAddresses,
-          uint[6] orderValues,
-          uint fillTakerTokenAmount,
-          bool shouldThrowOnInsufficientBalanceOrAllowance,
-          uint8 v,
-          bytes32 r,
-          bytes32 s)
-          public
-          returns (uint filledTakerTokenAmount)
+        address[5] orderAddresses,
+        uint[6] orderValues,
+        uint fillTakerTokenAmount,
+        bool shouldThrowOnInsufficientBalanceOrAllowance,
+        uint8 v,
+        bytes32 r,
+        bytes32 s)
+        public
+        returns (uint filledTakerTokenAmount)
     {
         Order memory order = Order({
             maker: orderAddresses[0],

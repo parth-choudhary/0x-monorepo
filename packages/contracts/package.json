@@ -23,7 +23,7 @@
         "test:circleci": "yarn test"
     },
     "config": {
-        "contracts": "Exchange,DummyToken,ZRXToken,Token,WETH9,TokenTransferProxy,MultiSigWallet,MultiSigWalletWithTimeLock,MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress,MaliciousToken,TokenRegistry"
+        "contracts": "Exchange,DummyToken,ZRXToken,Token,WETH9,TokenTransferProxy,MultiSigWallet,MultiSigWalletWithTimeLock,MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress,MaliciousToken,TokenRegistry,Forwarder"
     },
     "repository": {
         "type": "git",

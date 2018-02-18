@@ -189,6 +189,7 @@ export class Compiler {
         if (!_.isUndefined(compiled.errors)) {
             _.each(compiled.errors, errMsg => {
                 const normalizedErrMsg = Compiler._getNormalizedErrMsg(errMsg);
+                console.log(normalizedErrMsg);
                 this._solcErrors.add(normalizedErrMsg);
             });
         }
