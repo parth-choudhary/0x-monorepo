@@ -20,6 +20,8 @@ pragma solidity ^0.4.19;
 
 import "../LibOrder.sol";
 
+pragma experimental ABIEncoderV2;
+
 contract MSettlement is LibOrder {
   
     function settleOrder(

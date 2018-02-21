@@ -18,6 +18,8 @@
 
 pragma solidity ^0.4.19;
 
+pragma experimental ABIEncoderV2;
+
 contract LibOrder {
 
     struct Order {
@@ -31,30 +33,32 @@ contract LibOrder {
         uint256 makerFee;
         uint256 takerFee;
         uint256 expirationTimestampInSec;
-        bytes32 orderHash;
+        uint256 salt;
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
     }
 
     /// @dev Calculates Keccak-256 hash of order with specified parameters.
-    /// @param orderAddresses Array of order's maker, taker, makerToken, takerToken, and feeRecipient.
-    /// @param orderValues Array of order's makerTokenAmount, takerTokenAmount, makerFee, takerFee, expirationTimestampInSec, and salt.
+    /// @param order Order struct containing order specifications and signature.
     /// @return Keccak-256 hash of order.
-    function getOrderHash(address[5] orderAddresses, uint256[6] orderValues)
-        public view
+    function getOrderHash(Order order)
+        internal view
         returns (bytes32 orderHash)
     {
         orderHash = keccak256(
             address(this),
-            orderAddresses[0], // maker
-            orderAddresses[1], // taker
-            orderAddresses[2], // makerToken
-            orderAddresses[3], // takerToken
-            orderAddresses[4], // feeRecipient
-            orderValues[0],    // makerTokenAmount
-            orderValues[1],    // takerTokenAmount
-            orderValues[2],    // makerFee
-            orderValues[3],    // takerFee
-            orderValues[4],    // expirationTimestampInSec
-            orderValues[5]     // salt
+            order.maker,
+            order.taker,
+            order.makerToken,
+            order.takerToken,
+            order.feeRecipient,
+            order.makerTokenAmount,
+            order.takerTokenAmount,
+            order.makerFee,
+            order.takerFee,
+            order.expirationTimestampInSec,
+            order.salt
         );
         return orderHash;
     }

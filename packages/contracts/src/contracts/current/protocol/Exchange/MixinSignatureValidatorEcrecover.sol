@@ -20,6 +20,8 @@ pragma solidity ^0.4.19;
 
 import "./mixins/MSignatureValidator.sol";
 
+pragma experimental ABIEncoderV2;
+
 /// @dev Provides MSignatureValidator
 contract MixinSignatureValidatorEcrecover is
     MSignatureValidator

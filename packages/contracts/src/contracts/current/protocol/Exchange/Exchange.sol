@@ -23,6 +23,8 @@ import "./MixinSignatureValidatorEcrecover.sol";
 import "./MixinSettlementProxy.sol";
 import "./MixinWrapperFunctions.sol";
 
+pragma experimental ABIEncoderV2;
+
 contract Exchange is
     MixinExchangeCore,
     MixinSignatureValidatorEcrecover,

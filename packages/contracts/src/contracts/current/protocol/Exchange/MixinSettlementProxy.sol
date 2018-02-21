@@ -23,6 +23,8 @@ import "../TokenTransferProxy/ITokenTransferProxy.sol";
 import "../../tokens/Token/IToken.sol";
 import "./LibPartialAmount.sol";
 
+pragma experimental ABIEncoderV2;
+
 /// @dev Provides MixinSettlement
 contract MixinSettlementProxy is
     MSettlement,

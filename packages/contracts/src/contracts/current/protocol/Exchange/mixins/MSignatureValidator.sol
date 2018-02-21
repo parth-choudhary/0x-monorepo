@@ -18,6 +18,8 @@
 
 pragma solidity ^0.4.19;
 
+pragma experimental ABIEncoderV2;
+
 contract MSignatureValidator {
 
     /// @dev Verifies that an order signature is valid.

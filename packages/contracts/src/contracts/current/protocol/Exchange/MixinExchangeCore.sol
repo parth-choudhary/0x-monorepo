@@ -26,6 +26,8 @@ import "./LibErrors.sol";
 import "./LibPartialAmount.sol";
 import "../../utils/SafeMath/SafeMath.sol";
 
+pragma experimental ABIEncoderV2;
+
 /// @dev Provides MExchangeCore
 /// @dev Consumes MSettlement
 /// @dev Consumes MSignatureValidator
@@ -70,66 +72,43 @@ contract MixinExchangeCore is
     */
 
     /// @dev Fills the input order.
-    /// @param orderAddresses Array of order's maker, taker, makerToken, takerToken, and feeRecipient.
-    /// @param orderValues Array of order's makerTokenAmount, takerTokenAmount, makerFee, takerFee, expirationTimestampInSec, and salt.
+    /// @param order Order struct containing order specifications and signature.
     /// @param takerTokenFillAmount Desired amount of takerToken to fill.
-    /// @param v ECDSA signature parameter v.
-    /// @param r ECDSA signature parameters r.
-    /// @param s ECDSA signature parameters s.
     /// @return Total amount of takerToken filled in trade.
-    function fillOrder(
-          address[5] orderAddresses,
-          uint256[6] orderValues,
-          uint256 takerTokenFillAmount,
-          uint8 v,
-          bytes32 r,
-          bytes32 s)
-          public
-          returns (uint256 takerTokenFilledAmount)
+    function fillOrder(Order order, uint256 takerTokenFillAmount)
+        public
+        returns (uint256 takerTokenFilledAmount)
     {
-        Order memory order = Order({
-            maker: orderAddresses[0],
-            taker: orderAddresses[1],
-            makerToken: orderAddresses[2],
-            takerToken: orderAddresses[3],
-            feeRecipient: orderAddresses[4],
-            makerTokenAmount: orderValues[0],
-            takerTokenAmount: orderValues[1],
-            makerFee: orderValues[2],
-            takerFee: orderValues[3],
-            expirationTimestampInSec: orderValues[4],
-            orderHash: getOrderHash(orderAddresses, orderValues)
-        });
-
+        bytes32 orderHash = getOrderHash(order);
         require(order.taker == address(0) || order.taker == msg.sender);
         require(order.makerTokenAmount > 0 && order.takerTokenAmount > 0 && takerTokenFillAmount > 0);
         require(isValidSignature(
             order.maker,
-            order.orderHash,
-            v,
-            r,
-            s
+            orderHash,
+            order.v,
+            order.r,
+            order.s
         ));
 
         if (block.timestamp >= order.expirationTimestampInSec) {
-            LogError(uint8(Errors.ORDER_EXPIRED), order.orderHash);
+            LogError(uint8(Errors.ORDER_EXPIRED), orderHash);
             return 0;
         }
 
-        uint256 remainingTakerTokenAmount = safeSub(order.takerTokenAmount, getUnavailableTakerTokenAmount(order.orderHash));
+        uint256 remainingTakerTokenAmount = safeSub(order.takerTokenAmount, getUnavailableTakerTokenAmount(orderHash));
         takerTokenFilledAmount = min256(takerTokenFillAmount, remainingTakerTokenAmount);
         if (takerTokenFilledAmount == 0) {
-            LogError(uint8(Errors.ORDER_FULLY_FILLED_OR_CANCELLED), order.orderHash);
+            LogError(uint8(Errors.ORDER_FULLY_FILLED_OR_CANCELLED), orderHash);
             return 0;
         }
 
         if (isRoundingError(takerTokenFilledAmount, order.takerTokenAmount, order.makerTokenAmount)) {
-            LogError(uint8(Errors.ROUNDING_ERROR_TOO_LARGE), order.orderHash);
+            LogError(uint8(Errors.ROUNDING_ERROR_TOO_LARGE), orderHash);
             return 0;
         }
 
         // Update state
-        filled[order.orderHash] = safeAdd(filled[order.orderHash], takerTokenFilledAmount);
+        filled[orderHash] = safeAdd(filled[orderHash], takerTokenFilledAmount);
         
         // Settle order
         var (makerTokenFilledAmount, makerFeePaid, takerFeePaid) =
@@ -146,53 +125,37 @@ contract MixinExchangeCore is
             takerTokenFilledAmount,
             makerFeePaid,
             takerFeePaid,
-            order.orderHash
+            orderHash
         );
         return takerTokenFilledAmount;
     }
 
     /// @dev Cancels the input order.
-    /// @param orderAddresses Array of order's maker, taker, makerToken, takerToken, and feeRecipient.
-    /// @param orderValues Array of order's makerTokenAmount, takerTokenAmount, makerFee, takerFee, expirationTimestampInSec, and salt.
+    /// @param order Order struct containing order specifications and signature.
     /// @param takerTokenCancelAmount Desired amount of takerToken to cancel in order.
     /// @return Amount of takerToken cancelled.
-    function cancelOrder(
-        address[5] orderAddresses,
-        uint256[6] orderValues,
-        uint256 takerTokenCancelAmount)
+    function cancelOrder(Order order, uint256 takerTokenCancelAmount)
         public
         returns (uint256 takerTokenCancelledAmount)
     {
-        Order memory order = Order({
-            maker: orderAddresses[0],
-            taker: orderAddresses[1],
-            makerToken: orderAddresses[2],
-            takerToken: orderAddresses[3],
-            feeRecipient: orderAddresses[4],
-            makerTokenAmount: orderValues[0],
-            takerTokenAmount: orderValues[1],
-            makerFee: orderValues[2],
-            takerFee: orderValues[3],
-            expirationTimestampInSec: orderValues[4],
-            orderHash: getOrderHash(orderAddresses, orderValues)
-        });
+        bytes32 orderHash = getOrderHash(order);
 
         require(order.maker == msg.sender);
         require(order.makerTokenAmount > 0 && order.takerTokenAmount > 0 && takerTokenCancelAmount > 0);
 
         if (block.timestamp >= order.expirationTimestampInSec) {
-            LogError(uint8(Errors.ORDER_EXPIRED), order.orderHash);
+            LogError(uint8(Errors.ORDER_EXPIRED), orderHash);
             return 0;
         }
 
-        uint256 remainingTakerTokenAmount = safeSub(order.takerTokenAmount, getUnavailableTakerTokenAmount(order.orderHash));
+        uint256 remainingTakerTokenAmount = safeSub(order.takerTokenAmount, getUnavailableTakerTokenAmount(orderHash));
         takerTokenCancelledAmount = min256(takerTokenCancelAmount, remainingTakerTokenAmount);
         if (takerTokenCancelledAmount == 0) {
-            LogError(uint8(Errors.ORDER_FULLY_FILLED_OR_CANCELLED), order.orderHash);
+            LogError(uint8(Errors.ORDER_FULLY_FILLED_OR_CANCELLED), orderHash);
             return 0;
         }
 
-        cancelled[order.orderHash] = safeAdd(cancelled[order.orderHash], takerTokenCancelledAmount);
+        cancelled[orderHash] = safeAdd(cancelled[orderHash], takerTokenCancelledAmount);
 
         LogCancel(
             order.maker,
@@ -201,7 +164,7 @@ contract MixinExchangeCore is
             order.takerToken,
             getPartialAmount(takerTokenCancelledAmount, order.takerTokenAmount, order.makerTokenAmount),
             takerTokenCancelledAmount,
-            order.orderHash
+            orderHash
         );
         return takerTokenCancelledAmount;
     }
@@ -216,7 +179,10 @@ contract MixinExchangeCore is
         returns (bool isError)
     {
         uint256 remainder = mulmod(target, numerator, denominator);
-        if (remainder == 0) return false; // No rounding error.
+
+        if (remainder == 0) {
+            return false; // No rounding error.
+        }
 
         uint256 errPercentageTimes1000000 = safeDiv(
             safeMul(remainder, 1000000),

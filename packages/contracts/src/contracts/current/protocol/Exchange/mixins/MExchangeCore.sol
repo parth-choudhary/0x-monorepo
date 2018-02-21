@@ -18,22 +18,17 @@
 
 pragma solidity ^0.4.19;
 
-contract MExchangeCore {
-    
-    function fillOrder(
-          address[5] orderAddresses,
-          uint256[6] orderValues,
-          uint256 takerTokenFillAmount,
-          uint8 v,
-          bytes32 r,
-          bytes32 s)
-          public
-          returns (uint256 takerTokenFilledAmount);
+import "../LibOrder.sol";
 
-    function cancelOrder(
-        address[5] orderAddresses,
-        uint256[6] orderValues,
-        uint256 takerTokenCancelAmount)
+pragma experimental ABIEncoderV2;
+
+contract MExchangeCore is LibOrder {
+    
+    function fillOrder(Order order, uint256 takerTokenFillAmount)
+        public
+        returns (uint256 takerTokenFilledAmount);
+
+    function cancelOrder(Order order, uint256 takerTokenCancelAmount)
         public
         returns (uint256 takerTokenCancelledAmount);
 
