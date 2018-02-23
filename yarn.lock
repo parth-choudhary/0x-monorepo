@@ -2,6 +2,15 @@
 # yarn lockfile v1
 
 
+"@0xproject/assert@^0.0.18":
+  version "0.0.18"
+  resolved "https://registry.yarnpkg.com/@0xproject/assert/-/assert-0.0.18.tgz#4575d61dbccf02f5f9406f06a89c96ea70732c23"
+  dependencies:
+    "@0xproject/json-schemas" "^0.7.10"
+    "@0xproject/utils" "^0.3.2"
+    lodash "^4.17.4"
+    valid-url "^1.0.9"
+
 "@types/accounting@^0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@types/accounting/-/accounting-0.4.1.tgz#865d9f5694fd7c438fba34eb4bc82eec6f34cdd5"

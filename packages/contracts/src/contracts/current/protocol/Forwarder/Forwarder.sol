@@ -1,8 +1,8 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.18;
 
 import "../Exchange/Exchange.sol";
 import "../TokenTransferProxy/TokenTransferProxy.sol";
-import { WETH9 as EtherToken } from "../../tokens/WETH9.sol";
+import { WETH9 as EtherToken } from "../../tokens/WETH9/WETH9.sol";
 
 contract Forwarder is SafeMath {
 
@@ -56,34 +56,34 @@ contract Forwarder is SafeMath {
         require(Token(orderAddresses[0]).transfer(msg.sender, makerTokenFilledAmount));
     }
 
-    function marketFillOrders(
-        address[5][] orderAddresses,
-        uint[6][] orderValues,
-        uint8[] v,
-        bytes32[] r,
-        bytes32[] s)
-        external
-        payable
-    {
-        require(msg.value > 0);
+    // function marketFillOrders(
+    //     address[5][] orderAddresses,
+    //     uint[6][] orderValues,
+    //     uint8[] v,
+    //     bytes32[] r,
+    //     bytes32[] s)
+    //     external
+    //     payable
+    // {
+    //     require(msg.value > 0);
 
-        uint256 takerTokenFillAmount = msg.value;
-        etherToken.deposit.value(takerTokenFillAmount);
+    //     uint256 takerTokenFillAmount = msg.value;
+    //     etherToken.deposit.value(takerTokenFillAmount);
 
-        // Note: We assume that takerToken of all orders is EtherToken
-        require(exchange.fillOrdersUpTo(
-            orderAddresses,
-            orderValues,
-            takerTokenFillAmount,
-            true,   // always throw on failed transfer
-            v,
-            r,
-            s
-        ) == takerTokenFillAmount);
+    //     // Note: We assume that takerToken of all orders is EtherToken
+    //     require(exchange.fillOrdersUpTo(
+    //         orderAddresses,
+    //         orderValues,
+    //         takerTokenFillAmount,
+    //         true,   // always throw on failed transfer
+    //         v,
+    //         r,
+    //         s
+    //     ) == takerTokenFillAmount);
 
-        uint256 makerTokenFilledAmount = getPartialAmount(orderValues[0], orderValues[1], takerTokenFillAmount);    // makerTokenAmount * takerTokenFillAmount / takerTokenAmount
-        require(Token(orderAddresses[0]).transfer(msg.sender, makerTokenFilledAmount));
-    }
+    //     uint256 makerTokenFilledAmount = getPartialAmount(orderValues[0], orderValues[1], takerTokenFillAmount);    // makerTokenAmount * takerTokenFillAmount / takerTokenAmount
+    //     require(Token(orderAddresses[0]).transfer(msg.sender, makerTokenFilledAmount));
+    // }
 
     function getPartialAmount(uint256 numerator, uint256 denominator, uint256 target)
         internal
