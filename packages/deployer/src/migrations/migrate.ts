@@ -33,8 +33,14 @@ export const migrator = {
             'MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress',
             multiSigArgs,
         );
-
         const owner = accounts[0];
+
+        const forwarderArgs = [exchange.address, tokenTransferProxy.address, etherToken.address, zrxToken.address];
+        const forwarder = await deployer.deployAndSaveAsync('Forwarder', forwarderArgs);
+
+        const forwarderInitializeGasEstimate = new BigNumber(50000);
+        await forwarder.initialize.sendTransactionAsync({ from: owner, gas: forwarderInitializeGasEstimate });
+
         await tokenTransferProxy.addAuthorizedAddress.sendTransactionAsync(exchange.address, { from: owner });
         await tokenTransferProxy.transferOwnership.sendTransactionAsync(multiSig.address, { from: owner });
         const addTokenGasEstimate = await tokenReg.addToken.estimateGasAsync(

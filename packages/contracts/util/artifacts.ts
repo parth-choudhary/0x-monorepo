@@ -1,5 +1,6 @@
 import * as DummyTokenArtifact from '../src/artifacts/DummyToken.json';
 import * as ExchangeArtifact from '../src/artifacts/Exchange.json';
+import * as Forwarder from '../src/artifacts/Forwarder.json';
 import * as MaliciousTokenArtifact from '../src/artifacts/MaliciousToken.json';
 import * as MultiSigWalletWithTimeLockArtifact from '../src/artifacts/MultiSigWalletWithTimeLock.json';
 import * as MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddressArtifact from '../src/artifacts/MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress.json';
@@ -22,4 +23,5 @@ export const artifacts = {
     TokenTransferProxyArtifact: (TokenTransferProxyArtifact as any) as Artifact,
     MultiSigWalletWithTimeLockArtifact: (MultiSigWalletWithTimeLockArtifact as any) as Artifact,
     MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddressArtifact: (MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddressArtifact as any) as Artifact,
+    Forwarder: (Forwarder as any) as Artifact,
 };

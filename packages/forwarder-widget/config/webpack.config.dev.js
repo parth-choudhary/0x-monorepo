@@ -113,6 +113,12 @@ module.exports = {
   },
   module: {
     strictExportPresence: true,
+    loaders: [
+      {
+        test: /\.json$/,
+        loader: 'json-loader'
+      }
+    ],
     rules: [
       // TODO: Disable require.ensure as it's not a standard language feature.
       // We are waiting for https://github.com/facebookincubator/create-react-app/issues/2176.
@@ -123,6 +129,10 @@ module.exports = {
         loader: require.resolve('source-map-loader'),
         enforce: 'pre',
         include: paths.appSrc,
+      },
+      {
+        test: /\.json$/,
+        loader: 'json-loader',
       },
       {
         // "oneOf" will traverse all following loaders until one will
@@ -140,25 +150,18 @@ module.exports = {
               name: 'static/media/[name].[hash:8].[ext]',
             },
           },
-          // Compile .tsx?
           {
             test: /\.(ts|tsx)$/,
-            include: paths.appSrc,
             use: [
-              {
-                loader: require.resolve('ts-loader'),
-                options: {
-                  // disable type checker - we will use it in fork plugin
-                  transpileOnly: true,
+                {
+                    loader: 'awesome-typescript-loader',
+                    query: {
+                        declaration: false,
+                    },
                 },
-              },
             ],
+            exclude: /node_modules/,
           },
-          // "postcss" loader applies autoprefixer to our CSS.
-          // "css" loader resolves paths in CSS and adds assets as dependencies.
-          // "style" loader turns CSS into JS modules that inject <style> tags.
-          // In production, we use a plugin to extract that CSS to a file, but
-          // in development "style" loader enables hot editing of CSS.
           {
             test: /\.css$/,
             use: [

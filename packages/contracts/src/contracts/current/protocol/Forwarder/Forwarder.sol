@@ -23,6 +23,12 @@ contract Forwarder is SafeMath {
         exchange = _exchange;
         tokenProxy = _tokenProxy;
         etherToken = _etherToken;
+        zrxToken = _zrxToken;
+    }
+
+    function initialize()
+        external
+    {
         etherToken.approve(address(tokenProxy), MAX_UINT);
         zrxToken.approve(address(zrxToken), MAX_UINT);
     }

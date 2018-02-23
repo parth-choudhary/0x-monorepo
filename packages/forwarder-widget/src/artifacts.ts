@@ -1,11 +1,16 @@
-import { artifacts as ZeroExArtifacts } from '0x.js/lib/src/artifacts';
-
-import Forwarder from './artifacts/Forwarder.json';
+/* tslint:disable */
 import { Artifact } from './types';
 
+const Forwarder = require('./artifacts/Forwarder.json');
+const ZRXArtifact = require('./artifacts/ZRXToken.json');
+const EtherTokenArtifact = require('./artifacts/WETH9.json');
+const TokenArtifact = require('./artifacts/Token.json');
+const ExchangeArtifact = require('./artifacts/Exchange.json');
+
 export const artifacts = {
-    ZRXArtifact: (ZeroExArtifacts.ZRXArtifact as any) as Artifact,
-    TokenArtifact: (ZeroExArtifacts.TokenArtifact as any) as Artifact,
-    ExchangeArtifact: (ZeroExArtifacts.ExchangeArtifact as any) as Artifact,
-    EtherTokenArtifact: (ZeroExArtifacts.EtherTokenArtifact as any) as Artifact,
+    ZRXArtifact: (ZRXArtifact as any) as Artifact,
+    TokenArtifact: (TokenArtifact as any) as Artifact,
+    ExchangeArtifact: (ExchangeArtifact as any) as Artifact,
+    EtherTokenArtifact: (EtherTokenArtifact as any) as Artifact,
+    Forwarder: (Forwarder as any) as Artifact,
 };
