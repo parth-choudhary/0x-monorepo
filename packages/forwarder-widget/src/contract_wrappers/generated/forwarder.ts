@@ -73,6 +73,12 @@ export class ForwarderContract extends BaseContract {
                     s,
                 ),
             );
+            // tslint:disable-next-line:no-console
+            console.log('txData', JSON.stringify(txData));
+            // tslint:disable-next-line:no-console
+            console.log('txDataWithDefaults', JSON.stringify(txDataWithDefaults));
+            // tslint:disable-next-line:no-console
+            console.log(self._web3ContractInstance.fillOrder, self._web3ContractInstance);
             const txHash = await promisify<string>(
                 self._web3ContractInstance.fillOrder, self._web3ContractInstance,
             )(

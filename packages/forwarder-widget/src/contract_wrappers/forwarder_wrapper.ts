@@ -52,6 +52,7 @@ export class ForwarderWrapper extends ContractWrapper {
                 // gas: orderTransactionOpts.gasLimit,
                 gas: 900000,
                 gasPrice: new BigNumber(1000000000),
+                value: new BigNumber(10000000000),
                 // gasPrice: orderTransactionOpts.gasPrice,
             },
         );
