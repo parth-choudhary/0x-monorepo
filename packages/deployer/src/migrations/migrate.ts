@@ -38,7 +38,7 @@ export const migrator = {
         const forwarderArgs = [exchange.address, tokenTransferProxy.address, etherToken.address, zrxToken.address];
         const forwarder = await deployer.deployAndSaveAsync('Forwarder', forwarderArgs);
 
-        const forwarderInitializeGasEstimate = new BigNumber(50000);
+        const forwarderInitializeGasEstimate = new BigNumber(90000);
         await forwarder.initialize.sendTransactionAsync({ from: owner, gas: forwarderInitializeGasEstimate });
 
         await tokenTransferProxy.addAuthorizedAddress.sendTransactionAsync(exchange.address, { from: owner });
