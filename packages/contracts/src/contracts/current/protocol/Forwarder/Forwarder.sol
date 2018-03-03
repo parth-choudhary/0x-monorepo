@@ -12,6 +12,13 @@ contract Forwarder is SafeMath {
     Token zrxToken;
 
     uint256 constant MAX_UINT = 2 ** 256 - 1;
+        // Error Codes
+    enum Errors {
+        INSUFFICIENT_ETHER_VALUE,
+        UNSUPPORTED_TOKEN_PAIR
+    }
+
+    event LogForwarderError(uint8 indexed errorId);
 
     function Forwarder(
         Exchange _exchange,
@@ -30,7 +37,7 @@ contract Forwarder is SafeMath {
         external
     {
         etherToken.approve(address(tokenProxy), MAX_UINT);
-        zrxToken.approve(address(zrxToken), MAX_UINT);
+        zrxToken.approve(address(tokenProxy), MAX_UINT);
     }
 
     function fillOrder(
@@ -41,55 +48,30 @@ contract Forwarder is SafeMath {
         bytes32 s)
         external
         payable
+        returns (uint256 takerTokenFilledAmount)
     {
-        require(msg.value > 0);
-        require(orderAddresses[3] == address(etherToken));  // takerToken must be etherToken
-        
-        uint256 takerTokenFillAmount = msg.value;
-        etherToken.deposit.value(takerTokenFillAmount);
+        assert(msg.value > 0);
+        assert(orderAddresses[3] == address(etherToken));
 
-        require(exchange.fillOrder(
+        // Set approval incase this is not WETH/ZRX
+        require(Token(orderAddresses[2]).approve(address(tokenProxy), MAX_UINT));
+
+        EtherToken(etherToken).deposit.value(msg.value)();
+
+        require(Exchange(exchange).fillOrder(
             orderAddresses,
             orderValues,
-            takerTokenFillAmount,
+            msg.value,
             true,   // always throw on failed transfer
             v,
             r,
             s
-        ) == takerTokenFillAmount);
+        ) == msg.value);
 
-        uint256 makerTokenFilledAmount = getPartialAmount(orderValues[0], orderValues[1], takerTokenFillAmount);    // makerTokenAmount * takerTokenFillAmount / takerTokenAmount
-        require(Token(orderAddresses[0]).transfer(msg.sender, makerTokenFilledAmount));
+        uint256 makerTokenFilledAmount = getPartialAmount(orderValues[0], orderValues[1], msg.value);    // makerTokenAmount * takerTokenFillAmount / takerTokenAmount
+        transferToken(orderAddresses[2], msg.sender, makerTokenFilledAmount);
+        return msg.value;
     }
-
-    // function marketFillOrders(
-    //     address[5][] orderAddresses,
-    //     uint[6][] orderValues,
-    //     uint8[] v,
-    //     bytes32[] r,
-    //     bytes32[] s)
-    //     external
-    //     payable
-    // {
-    //     require(msg.value > 0);
-
-    //     uint256 takerTokenFillAmount = msg.value;
-    //     etherToken.deposit.value(takerTokenFillAmount);
-
-    //     // Note: We assume that takerToken of all orders is EtherToken
-    //     require(exchange.fillOrdersUpTo(
-    //         orderAddresses,
-    //         orderValues,
-    //         takerTokenFillAmount,
-    //         true,   // always throw on failed transfer
-    //         v,
-    //         r,
-    //         s
-    //     ) == takerTokenFillAmount);
-
-    //     uint256 makerTokenFilledAmount = getPartialAmount(orderValues[0], orderValues[1], takerTokenFillAmount);    // makerTokenAmount * takerTokenFillAmount / takerTokenAmount
-    //     require(Token(orderAddresses[0]).transfer(msg.sender, makerTokenFilledAmount));
-    // }
 
     function getPartialAmount(uint256 numerator, uint256 denominator, uint256 target)
         internal
@@ -97,5 +79,11 @@ contract Forwarder is SafeMath {
         returns (uint256)
     {
         return safeDiv(safeMul(numerator, target), denominator);
+    }
+
+    function transferToken(address token, address account, uint amount)
+        internal
+    {
+        require(Token(token).transfer(account, amount));
     }
 }

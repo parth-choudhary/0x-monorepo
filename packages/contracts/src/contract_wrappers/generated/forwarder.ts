@@ -62,7 +62,7 @@ export class ForwarderContract extends BaseContract {
             r: string,
             s: string,
             txData: TxDataPayable = {},
-        ): Promise<void
+        ): Promise<BigNumber
     > {
             const self = this as ForwarderContract;
             const txDataWithDefaults = await self._applyDefaultsToTxDataAsync(txData);
