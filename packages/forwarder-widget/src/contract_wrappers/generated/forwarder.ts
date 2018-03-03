@@ -10,6 +10,17 @@ import * as Web3 from 'web3';
 
 import {BaseContract} from './base_contract';
 
+export type ForwarderContractEventArgs =
+    | LogForwarderErrorContractEventArgs;
+
+export enum ForwarderEvents {
+    LogForwarderError = 'LogForwarderError',
+}
+
+export interface LogForwarderErrorContractEventArgs {
+    errorId: BigNumber;
+}
+
 
 export class ForwarderContract extends BaseContract {
     public initialize = {
@@ -73,12 +84,6 @@ export class ForwarderContract extends BaseContract {
                     s,
                 ),
             );
-            // tslint:disable-next-line:no-console
-            console.log('txData', JSON.stringify(txData));
-            // tslint:disable-next-line:no-console
-            console.log('txDataWithDefaults', JSON.stringify(txDataWithDefaults));
-            // tslint:disable-next-line:no-console
-            console.log(self._web3ContractInstance.fillOrder, self._web3ContractInstance);
             const txHash = await promisify<string>(
                 self._web3ContractInstance.fillOrder, self._web3ContractInstance,
             )(

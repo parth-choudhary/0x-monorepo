@@ -33,7 +33,7 @@ export class ForwarderWrapper extends ContractWrapper {
     }
     public async fillOrderAsync(
         signedOrder: SignedOrder,
-        fillAmountEth: BigNumber,
+        fillAmountBaseUnits: BigNumber,
         from: string,
         orderTransactionOpts: OrderTransactionOpts = {},
     ): Promise<string> {
@@ -49,14 +49,17 @@ export class ForwarderWrapper extends ContractWrapper {
             signedOrder.ecSignature.s,
             {
                 from,
-                // gas: orderTransactionOpts.gasLimit,
                 gas: 900000,
                 gasPrice: new BigNumber(1000000000),
-                value: new BigNumber(10000000000),
-                // gasPrice: orderTransactionOpts.gasPrice,
+                value: fillAmountBaseUnits,
             },
         );
         return txHash;
+    }
+
+    public async getForwarderContractAddressAsync(): Promise<string> {
+        const web3ContractInstance = await this._instantiateContractIfExistsAsync(artifacts.Forwarder);
+        return web3ContractInstance.address;
     }
 
     private async _getForwarderContractAsync(): Promise<ForwarderContract> {
