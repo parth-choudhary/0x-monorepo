@@ -134,7 +134,7 @@ async function fillOrder(fillAmount: BigNumber, signedOrder: SignedOrder) {
 class BuyWidget extends React.Component {
     constructor(props: any) {
         super(props);
-        this.state = { amount: '1', order: undefined, account: undefined, balance: undefined };
+        this.state = { amount: '1', order: undefined, account: undefined, balance: undefined, isTransactionActive: false };
 
         this.handleAmountChange = this.handleAmountChange.bind(this);
         this.handleOrderChange = this.handleOrderChange.bind(this);
@@ -148,17 +148,21 @@ class BuyWidget extends React.Component {
 
     // tslint:disable-next-line:member-access
     async updateState() {
+        this.setState((prev, props) => {
+            return { ...prev, isTransactionActive: true };
+        });
         const addresses = await web3Wrapper.getAvailableAddressesAsync();
         const address = addresses[0];
         const addressBalance = await web3Wrapper.getBalanceInWeiAsync(address);
         const ethAddressBalance = ZeroEx.toUnitAmount(addressBalance, 18).round(4);
         this.setState((prev, props) => {
-            return { ...prev, account: address, balance: ethAddressBalance.toString()};
+            return { ...prev, account: address, balance: ethAddressBalance.toString(), isTransactionActive: false };
         });
     }
 
     // tslint:disable-next-line:member-access
     handleAmountChange = (event: any) => {
+        event.preventDefault();
         const rawValue = event.target.value;
         let value: undefined | BigNumber;
         if (!_.isUndefined(rawValue) && !_.isEmpty(rawValue)) {
@@ -169,10 +173,10 @@ class BuyWidget extends React.Component {
         this.setState((prev, props) => {
             return { ...prev, amount: value };
         });
-        event.preventDefault();
     }
     // tslint:disable-next-line:member-access
     handleOrderChange = (event: any) => {
+        event.preventDefault();
         const rawValue = event.target.value;
         let value: undefined | string;
         if (!_.isUndefined(rawValue) && !_.isEmpty(rawValue)) {
@@ -181,14 +185,19 @@ class BuyWidget extends React.Component {
         this.setState((prev, props) => {
             return { ...prev, order: value };
         });
-        event.preventDefault();
     }
 
     public async handleSubmit(event: any) {
         event.preventDefault();
+        this.setState((prev, props) => {
+            return { ...prev, isTransactionActive: true };
+        });
         const signedOrder = convertPortalOrder((this.state as any).order);
         const fillAmount = (this.state as any).amount;
         await fillOrder(fillAmount, signedOrder);
+        this.setState((prev, props) => {
+            return { ...prev, isTransactionActive: false };
+        });
     }
     // tslint:disable-next-line:prefer-function-over-method member-access
     render() {
@@ -196,35 +205,35 @@ class BuyWidget extends React.Component {
             <Content>
                 <AccountBlockie account={(this.state as any).account} ethBalance={(this.state as any).balance} />
                 <Label isSize="small">SELECT TOKEN</Label>
-                <Field>
+                <Field isFullWidth={true}>
                     <TokenSelector />
                 </Field>
-                <Label style={{marginTop: 30}} isSize="small">BUY AMOUNT</Label>
-                <Field isHorizontal={true} isGrouped={true}>
-                    <Control isExpanded={true}>
-                        <Input style={{width: '130px'}} type="text" placeholder="1" onChange={this.handleAmountChange.bind(this)} />
-                        <Select>
-                            <option>ETH</option>
-                            <option>GWEI</option>
-                        </Select>
-                    </Control>
+                <Label style={{ marginTop: 30 }} isSize="small">
+                    BUY AMOUNT
+                </Label>
+                <Field isFullWidth={true} isHorizontal={true} isGrouped={true}>
+                    <Columns isGapless={true} isCentered={true}>
+                        <Column isSize={8}>
+                            <Input type="text" placeholder="1" onChange={this.handleAmountChange.bind(this)} />
+                        </Column>
+                        <Column>
+                            <Select>
+                                <option>ETH</option>
+                                <option>ZRX</option>
+                            </Select>
+                        </Column>
+                    </Columns>
                 </Field>
-                {/* <Field>
-                    <Label>ORDER</Label>
-                    <Control>
-                        <TextArea placeholder={''} onChange={this.handleOrderChange.bind(this)} />
-                    </Control>
-                </Field> */}
                 {/* <Field>
                     <strong> ESTIMATED COST </strong>
                 </Field> */}
-                <Field style={{marginTop: 20}}>
-                    <Button style={{width: '220px' }} isColor="info" onClick={this.handleSubmit}>
-                    SUBMIT ORDER
+                <Field style={{ marginTop: 20 }}>
+                    <Button isLoading={(this.state as any).isTransactionActive} isFullWidth={true} isColor="info" onClick={this.handleSubmit}>
+                        SUBMIT ORDER
                     </Button>
                 </Field>
-                <Field style={{marginTop: 20}} isGrouped={'centered'}>
-                    <img style={{ marginLeft: '0px', height: '20px'}} src="/images/powered.png" />
+                <Field style={{ marginTop: 20 }} isGrouped={'centered'}>
+                    <img style={{ marginLeft: '0px', height: '20px' }} src="/images/powered.png" />
                 </Field>
             </Content>
         );

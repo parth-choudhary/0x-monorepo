@@ -1,5 +1,7 @@
 import {
     Button,
+    Column,
+    Columns,
     Content,
     Dropdown,
     DropdownContent,
@@ -37,50 +39,45 @@ class TokenSelector extends React.Component {
 
     // tslint:disable-next-line:prefer-function-over-method member-access
     render() {
-        const divStyle = {
-            // padding: '20px',
-            marginLeft: '8px',
+        const fullWidth = {
+            width: '100%',
         };
         return (
-                <Field>
-                    <Dropdown isHoverable={true}>
-                        <DropdownTrigger>
-                            <Button style={{width: '220px' }} isOutlined={true} aria-haspopup="true" aria-controls="dropdown-menu">
+            <Dropdown isHoverable={true} style={fullWidth}>
+                <DropdownTrigger style={fullWidth}>
+                    <Button isOutlined={true} isFullWidth={true} aria-haspopup="true" aria-controls="dropdown-menu">
+                        <span className={'icon-ZeroEx'} style={{paddingRight: '10px'}} />
+                        <Label style={{ paddingTop: '5px' }} isSize={'small'}>
+                            ZRX - 0x Token
+                        </Label>
+                        <Icon icon="angle-down" isSize="small" isPulled={'right'} style={{ marginLeft: '8px' }} />
+                    </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                    <DropdownContent>
+                        <DropdownItem onClick={this.handleItemSelected} href="#">
+                            <span>
+                                <span className="icon-BAT_icon">
+                                    <span className="path1" />
+                                    <span className="path2" />
+                                    <span className="path3" />
+                                    <span className="path4" />
+                                    <span className="path5" />
+                                </span>
+                                {'  '}
+                                <strong>BAT</strong> - Basic Attention Token
+                            </span>
+                        </DropdownItem>
+                        <DropdownItem onClick={this.handleItemSelected} href="#" isActive={true}>
+                            <span>
                                 <span className={'icon-ZeroEx'} />
-                                <Label isSize={'small'}>
-                                <div style={divStyle}>
-                                    ZRX - 0x Token
-                                    <Icon icon="angle-down" isSize="small" style={divStyle}/>
-                                </div>
-                                </Label>
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu>
-                            <DropdownContent style={{width: '220px'}}>
-                                <DropdownItem onClick={this.handleItemSelected} href="#">
-                                    <span>
-                                        <span className="icon-BAT_icon">
-                                            <span className="path1" />
-                                            <span className="path2" />
-                                            <span className="path3" />
-                                            <span className="path4" />
-                                            <span className="path5" />
-                                        </span>
-                                        {'  '}
-                                        <strong>BAT</strong> - Basic Attention Token
-                                    </span>
-                                </DropdownItem>
-                                <DropdownItem onClick={this.handleItemSelected} href="#" isActive={true}>
-                                    <span>
-                                        <span className={'icon-ZeroEx'} />
-                                        {'  '}
-                                        <strong>ZRX</strong> - 0x Token
-                                    </span>
-                                </DropdownItem>
-                            </DropdownContent>
-                        </DropdownMenu>
-                    </Dropdown>
-                </Field>
+                                {'  '}
+                                <strong>ZRX</strong> - 0x Token
+                            </span>
+                        </DropdownItem>
+                    </DropdownContent>
+                </DropdownMenu>
+            </Dropdown>
         );
     }
 }

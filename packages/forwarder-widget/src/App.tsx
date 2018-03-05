@@ -30,33 +30,20 @@ class App extends React.Component {
     render() {
         return (
             <Container style={{ marginTop: 20, marginLeft: 20 }}>
-                <Columns>
-                    <Column isSize={{ mobile: 8, default: '1/3' }}>
-                        <Columns>
-                            <Column isSize={{ mobile: 8, default: '2/3' }}>
-                                <Card>
-                                    <CardHeaderTitle>
-                                        <Label isSize={'small'}>0x TRADE WIDGET</Label>
-                                    </CardHeaderTitle>
-                                    <CardContent>
-                                        <BuyWidget />
-                                    </CardContent>
-                                </Card>
-                            </Column>
-                        </Columns>
-                    </Column>
-                    <Column isSize={{ mobile: 8 }}>
-                        <pre>
-                            <code>1. Paste in a X/WETH 0x order from Portal</code>
-                        </pre>
-                        <pre>
-                            <code>2. Fill in the amount you want to take in ETH</code>
-                        </pre>
-                        <pre>
-                            <code>3. Order is filled, no allowances needed!</code>
-                        </pre>
-                    </Column>
-                </Columns>
+                <Content>
+                    <Columns>
+                        <Column isSize={{ mobile: 12, default: '1/4' }}>
+                            <Card>
+                                <CardHeaderTitle>
+                                    <Label isSize={'small'}>0x TRADE WIDGET</Label>
+                                </CardHeaderTitle>
+                                <CardContent>
+                                    <BuyWidget />
+                                </CardContent>
+                            </Card>
+                        </Column>
+                    </Columns>
+                </Content>
             </Container>
         );
     }
