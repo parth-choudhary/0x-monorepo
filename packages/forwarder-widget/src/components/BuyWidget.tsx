@@ -67,68 +67,6 @@ async function fillOrder(fillAmount: BigNumber, signedOrder: SignedOrder) {
     const msgSender = addresses[0];
     const txHash = await forwarder.fillOrderAsync(signedOrder, fillAmount, msgSender);
     const receipt = await zeroEx.awaitTransactionMinedAsync(txHash);
-
-    // DEBUG
-    const forwarderAddress = await forwarder.getForwarderContractAddressAsync();
-    const orderHash = ZeroEx.getOrderHashHex(signedOrder);
-    const unavailableAmount = await zeroEx.exchange.getUnavailableTakerAmountAsync(orderHash);
-    const forwarderEthBlanace = await web3Wrapper.getBalanceInWeiAsync(forwarderAddress);
-    // tslint:disable:no-console
-    console.log(txHash);
-    console.log(receipt.status, receipt.logs);
-    console.log('unavailableAmount', unavailableAmount.toString());
-    console.log('balance of maker', signedOrder.maker);
-    console.log(
-        'maker tokens: ',
-        (await zeroEx.token.getBalanceAsync(signedOrder.makerTokenAddress, signedOrder.maker)).toString(),
-    );
-    console.log(
-        'taker tokens: ',
-        (await zeroEx.token.getBalanceAsync(signedOrder.takerTokenAddress, signedOrder.maker)).toString(),
-    );
-    console.log(
-        'allowance maker tokens:',
-        (await zeroEx.token.getProxyAllowanceAsync(signedOrder.makerTokenAddress, signedOrder.maker)).toString(),
-    );
-    console.log(
-        'allowance taker tokens:',
-        (await zeroEx.token.getProxyAllowanceAsync(signedOrder.takerTokenAddress, signedOrder.maker)).toString(),
-    );
-    console.log('balance of taker', msgSender);
-    console.log(
-        'maker tokens: ',
-        (await zeroEx.token.getBalanceAsync(signedOrder.makerTokenAddress, msgSender)).toString(),
-    );
-    console.log(
-        'taker tokens: ',
-        (await zeroEx.token.getBalanceAsync(signedOrder.takerTokenAddress, msgSender)).toString(),
-    );
-    console.log(
-        'allowance maker tokens:',
-        (await zeroEx.token.getProxyAllowanceAsync(signedOrder.makerTokenAddress, msgSender)).toString(),
-    );
-    console.log(
-        'allowance taker tokens:',
-        (await zeroEx.token.getProxyAllowanceAsync(signedOrder.takerTokenAddress, msgSender)).toString(),
-    );
-    console.log('balance of forwarder', forwarderAddress);
-    console.log(
-        'maker tokens: ',
-        (await zeroEx.token.getBalanceAsync(signedOrder.makerTokenAddress, forwarderAddress)).toString(),
-    );
-    console.log(
-        'taker tokens: ',
-        (await zeroEx.token.getBalanceAsync(signedOrder.takerTokenAddress, forwarderAddress)).toString(),
-    );
-    console.log('eth: ', forwarderEthBlanace.toString());
-    console.log(
-        'allowance maker tokens:',
-        (await zeroEx.token.getProxyAllowanceAsync(signedOrder.makerTokenAddress, forwarderAddress)).toString(),
-    );
-    console.log(
-        'allowance taker tokens:',
-        (await zeroEx.token.getProxyAllowanceAsync(signedOrder.takerTokenAddress, forwarderAddress)).toString(),
-    );
 }
 
 class BuyWidget extends React.Component {
