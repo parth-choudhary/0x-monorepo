@@ -134,11 +134,27 @@ async function fillOrder(fillAmount: BigNumber, signedOrder: SignedOrder) {
 class BuyWidget extends React.Component {
     constructor(props: any) {
         super(props);
-        this.state = { amount: '1', order: undefined };
+        this.state = { amount: '1', order: undefined, account: undefined, balance: undefined };
 
         this.handleAmountChange = this.handleAmountChange.bind(this);
         this.handleOrderChange = this.handleOrderChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    // tslint:disable-next-line:member-access
+    async componentDidMount() {
+        await this.updateState();
+    }
+
+    // tslint:disable-next-line:member-access
+    async updateState() {
+        const addresses = await web3Wrapper.getAvailableAddressesAsync();
+        const address = addresses[0];
+        const addressBalance = await web3Wrapper.getBalanceInWeiAsync(address);
+        const ethAddressBalance = ZeroEx.toUnitAmount(addressBalance, 18).round(4);
+        this.setState((prev, props) => {
+            return { ...prev, account: address, balance: ethAddressBalance.toString()};
+        });
     }
 
     // tslint:disable-next-line:member-access
@@ -178,7 +194,7 @@ class BuyWidget extends React.Component {
     render() {
         return (
             <Content>
-                <AccountBlockie />
+                <AccountBlockie account={(this.state as any).account} ethBalance={(this.state as any).balance} />
                 <Label isSize="small">SELECT TOKEN</Label>
                 <Field>
                     <TokenSelector />
@@ -204,7 +220,7 @@ class BuyWidget extends React.Component {
                 </Field> */}
                 <Field style={{marginTop: 20}}>
                     <Button style={{width: '220px' }} isColor="info" onClick={this.handleSubmit}>
-                        SUBMIT ORDER
+                    SUBMIT ORDER
                     </Button>
                 </Field>
                 <Field style={{marginTop: 20}} isGrouped={'centered'}>
