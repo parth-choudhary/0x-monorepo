@@ -3,6 +3,7 @@ import {
     Column,
     Columns,
     Content,
+    Control,
     Dropdown,
     DropdownContent,
     DropdownDivider,
@@ -13,6 +14,7 @@ import {
     Icon,
     Image,
     Label,
+    Select,
 } from 'bloomer';
 import * as _ from 'lodash';
 import * as React from 'react';
@@ -45,35 +47,44 @@ class TokenSelector extends React.Component {
         return (
             <Dropdown isHoverable={true} style={fullWidth}>
                 <DropdownTrigger style={fullWidth}>
-                    <Button isOutlined={true} isFullWidth={true} aria-haspopup="true" aria-controls="dropdown-menu">
-                        <span className={'icon-ZeroEx'} style={{paddingRight: '10px'}} />
-                        <Label style={{ paddingTop: '5px' }} isSize={'small'}>
-                            ZRX - 0x Token
-                        </Label>
-                        <Icon icon="angle-down" isSize="small" isPulled={'right'} style={{ marginLeft: '8px' }} />
-                    </Button>
+                    <Field>
+                        <Control hasIcons={['left', 'right']}>
+                            <Button className={'select is-fullwidth'}>
+                                <Label style={{ paddingTop: '5px' }} isSize={'small'}>
+                                    ZRX - 0x Token
+                                </Label>
+                                <span className={'icon-ZeroEx is-left icon'} />
+                            </Button>
+                        </Control>
+                    </Field>
                 </DropdownTrigger>
                 <DropdownMenu>
                     <DropdownContent>
                         <DropdownItem onClick={this.handleItemSelected} href="#">
-                            <span>
-                                <span className="icon-BAT_icon">
+                            <Field hasAddons={true} style={fullWidth}>
+                                <span className="icon-BAT_icon is-left icon">
                                     <span className="path1" />
                                     <span className="path2" />
                                     <span className="path3" />
                                     <span className="path4" />
                                     <span className="path5" />
                                 </span>
-                                {'  '}
-                                <strong>BAT</strong> - Basic Attention Token
-                            </span>
+                                <Control isExpanded={true} hasIcons={'left'}>
+                                    <Label style={{ paddingLeft: '5px', paddingTop: '5px' }} isSize={'small'}>
+                                        BAT - Basic Attention Token
+                                    </Label>
+                                </Control>
+                            </Field>
                         </DropdownItem>
-                        <DropdownItem onClick={this.handleItemSelected} href="#" isActive={true}>
-                            <span>
-                                <span className={'icon-ZeroEx'} />
-                                {'  '}
-                                <strong>ZRX</strong> - 0x Token
-                            </span>
+                        <DropdownItem onClick={this.handleItemSelected} href="#">
+                            <Field hasAddons={true}>
+                                <span className={'icon-ZeroEx is-left icon'} />
+                                <Control hasIcons={'left'}>
+                                    <Label style={{ paddingLeft: '5px', paddingTop: '5px' }} isSize={'small'}>
+                                        ZRX - 0x Token
+                                    </Label>
+                                </Control>
+                            </Field>
                         </DropdownItem>
                     </DropdownContent>
                 </DropdownMenu>

@@ -9,6 +9,8 @@ import { Blockie } from './Blockie';
 interface AccountBlockiePropTypes {
     account?: string;
     ethBalance?: string;
+    selectedToken?: string;
+    tokenBalance?: string;
 }
 
 class AccountBlockie extends React.Component<AccountBlockiePropTypes> {
@@ -35,6 +37,9 @@ class AccountBlockie extends React.Component<AccountBlockiePropTypes> {
                 </Field>
                 <Field isMarginless={true} hasAddons={'centered'}>
                     <Label isSize={'small'}> {this.props.ethBalance} ETH</Label>
+                </Field>
+                <Field isMarginless={true} hasAddons={'centered'}>
+                    <Label isSize={'small'}> {this.props.tokenBalance} {this.props.selectedToken}</Label>
                 </Field>
             </Content>
         );

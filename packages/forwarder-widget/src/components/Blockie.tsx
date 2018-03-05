@@ -92,8 +92,6 @@ class Blockie extends React.Component<IdenticonPropTypes> {
 
             // const color = 'hsl(' + h + '%' + ',' + s + '%' + ',' + l + ')';
             const color = `hsl(${h},${s}%,${l}%)`;
-            // tslint:disable-next-line:no-console
-            console.log(color);
             return color;
         }
 
@@ -174,7 +172,7 @@ class Blockie extends React.Component<IdenticonPropTypes> {
     render() {
         return (
             <canvas
-                style={{'border-radius': '15px', 'border': '2px solid rgba(230,230,230,0.8)', 'box-shadow': '1px 1px rgba(230,230,230,0.3)'}}
+                style={{borderRadius: '15px', border: '2px solid rgba(230,230,230,0.8)', boxShadow: '1px 1px rgba(230,230,230,0.3)'}}
                 ref={identicon => {
                     this.identicon = identicon;
                 }}
