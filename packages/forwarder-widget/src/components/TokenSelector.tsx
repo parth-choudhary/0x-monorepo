@@ -95,8 +95,8 @@ class TokenSelector extends React.Component<TokenSelectorPropTypes, TokenSelecto
                         </Control>
                     </Field>
                 </DropdownTrigger>
-                <DropdownMenu>
-                    <DropdownContent>{dropdownItems}</DropdownContent>
+                <DropdownMenu style={fullWidth}>
+                    <DropdownContent style={fullWidth}>{dropdownItems}</DropdownContent>
                 </DropdownMenu>
             </Dropdown>
         );
