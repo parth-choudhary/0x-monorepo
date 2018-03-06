@@ -210,17 +210,6 @@ class BuyWidget extends React.Component<BuyWidgetPropTypes, BuyWidgetState> {
                             <option>ZRX</option>
                         </Select>
                     </Control>
-                    {/* <Columns isGapless={true} isCentered={true}>
-                        <Column isSize={8}>
-                            <Input type="text" placeholder="1" onChange={this.handleAmountChange.bind(this)} />
-                        </Column>
-                        <Column>
-                            <Select>
-                                <option>ETH</option>
-                                <option>ZRX</option>
-                            </Select>
-                        </Column>
-                    </Columns> */}
                 </Field>
                 {/* <Field>
                     <strong> ESTIMATED COST </strong>

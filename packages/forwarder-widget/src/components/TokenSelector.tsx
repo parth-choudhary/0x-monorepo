@@ -20,22 +20,45 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { TokenSelectorItem } from './TokenSelectorItem';
+import { definedTokensToIcon, TokenSelectorItem } from './TokenSelectorItem';
 
-class TokenSelector extends React.Component {
-    private _tokens: any[];
-    constructor(props: any) {
+interface TokenSelectorPropTypes {
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+interface TokenSelectorState {
+    selectedToken: string;
+    active: boolean;
+}
+
+interface TokenMetadata {
+    id: string;
+    symbol: string;
+    description: string;
+}
+
+class TokenSelector extends React.Component<TokenSelectorPropTypes, TokenSelectorState> {
+    // tslint:disable-next-line:underscore-private-and-protected
+    private static defaultProps = {
+        // tslint:disable-next-line:no-empty
+        onChange: () => {},
+    };
+    private _tokens: TokenMetadata[];
+    constructor(props: TokenSelectorPropTypes) {
         super(props);
-        this.state = { active: false };
+        this.state = { active: false, selectedToken: 'ZRX' };
         this.handleItemSelected = this.handleItemSelected.bind(this);
-        this._tokens = [];
+        this._tokens = [
+            { symbol: 'ZRX', id: 'ZRX', description: '0x Token' },
+            { symbol: 'BAT', id: 'BAT', description: 'Basic Attention Token' },
+        ];
     }
 
-    public handleItemSelected(event: any) {
-        // tslint:disable-next-line:no-console
-        console.log(event.target);
+    public handleItemSelected(item: TokenSelectorItem, event: any) {
+        const { onChange } = this.props;
+        onChange(event);
         this.setState((prev, props) => {
-            return { ...prev, active: false };
+            return { ...prev, active: false, selectedToken: item.props.id };
         });
     }
 
@@ -44,52 +67,45 @@ class TokenSelector extends React.Component {
         const fullWidth = {
             width: '100%',
         };
+        const dropdownItems = _.map(this._tokens, tokenItem => (
+            <TokenSelectorItem
+                description={tokenItem.description}
+                symbol={tokenItem.symbol}
+                id={tokenItem.id}
+                key={tokenItem.id}
+                onClick={this.handleItemSelected}
+            />
+        ));
+        const currentMetadata = this._getTokenMetadata(this.state.selectedToken);
+        const currentIcon = definedTokensToIcon[currentMetadata.symbol];
+        const activeToken = (
+            <Button className={'select is-fullwidth'}>
+                <Label style={{ paddingTop: '5px' }} isSize={'small'}>
+                    {currentMetadata.symbol} - {currentMetadata.description}
+                </Label>
+                {currentIcon}
+            </Button>
+        );
         return (
             <Dropdown isHoverable={true} style={fullWidth}>
                 <DropdownTrigger style={fullWidth}>
                     <Field>
                         <Control hasIcons={['left', 'right']}>
-                            <Button className={'select is-fullwidth'}>
-                                <Label style={{ paddingTop: '5px' }} isSize={'small'}>
-                                    ZRX - 0x Token
-                                </Label>
-                                <span className={'icon-ZeroEx is-left icon'} />
-                            </Button>
+                            {activeToken}
                         </Control>
                     </Field>
                 </DropdownTrigger>
                 <DropdownMenu>
-                    <DropdownContent>
-                        <DropdownItem onClick={this.handleItemSelected} href="#">
-                            <Field hasAddons={true} style={fullWidth}>
-                                <span className="icon-BAT_icon is-left icon">
-                                    <span className="path1" />
-                                    <span className="path2" />
-                                    <span className="path3" />
-                                    <span className="path4" />
-                                    <span className="path5" />
-                                </span>
-                                <Control isExpanded={true} hasIcons={'left'}>
-                                    <Label style={{ paddingLeft: '5px', paddingTop: '5px' }} isSize={'small'}>
-                                        BAT - Basic Attention Token
-                                    </Label>
-                                </Control>
-                            </Field>
-                        </DropdownItem>
-                        <DropdownItem onClick={this.handleItemSelected} href="#">
-                            <Field hasAddons={true}>
-                                <span className={'icon-ZeroEx is-left icon'} />
-                                <Control hasIcons={'left'}>
-                                    <Label style={{ paddingLeft: '5px', paddingTop: '5px' }} isSize={'small'}>
-                                        ZRX - 0x Token
-                                    </Label>
-                                </Control>
-                            </Field>
-                        </DropdownItem>
-                    </DropdownContent>
+                    <DropdownContent>{dropdownItems}</DropdownContent>
                 </DropdownMenu>
             </Dropdown>
         );
+    }
+
+    private _getTokenMetadata(symbol: string): TokenMetadata {
+        return _.find(this._tokens, tokenMetadata => {
+            return tokenMetadata.symbol === symbol;
+        });
     }
 }
 
