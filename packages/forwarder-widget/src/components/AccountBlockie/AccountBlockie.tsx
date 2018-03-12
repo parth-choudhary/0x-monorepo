@@ -6,14 +6,24 @@ import * as Web3 from 'web3';
 
 import { Blockie } from './Blockie';
 
-interface AccountBlockiePropTypes {
+/**
+ * AccountBlockie properties.
+ */
+interface AccountBlockieProps {
+    /** account the account to display in the component, used to seed the image */
     account?: string;
+    /** ethBalance the balance to display in the component */
     ethBalance?: string;
+    /** selectedToken the token to display in the component */
     selectedToken?: string;
+    /** tokenBalance the token balance to display in the component */
     tokenBalance?: string;
 }
 
-class AccountBlockie extends React.Component<AccountBlockiePropTypes> {
+/**
+ * AccountBlockie displays an image of the given account to give a visual representation of the address
+ */
+class AccountBlockie extends React.Component<AccountBlockieProps, {}> {
     // tslint:disable-next-line:prefer-function-over-method member-access
     minimisedAccount(account: string): string {
         //   0xea95a7...609353b2
@@ -46,4 +56,4 @@ class AccountBlockie extends React.Component<AccountBlockiePropTypes> {
     }
 }
 
-export { AccountBlockie };
+export { AccountBlockie, AccountBlockieProps };

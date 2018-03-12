@@ -1,6 +1,10 @@
+propsParserOpts = {
+  skipPropsWithoutDoc: true
+};
+
 module.exports = {
   assetsDir: './public',
-  propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.json', [{}]).parse,
+  propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.json', [propsParserOpts]).parse,
   components: 'src/components/**/*.{ts,tsx}',
   webpackConfig: require('./config/webpack.config.dev.js'),
   sections: [
