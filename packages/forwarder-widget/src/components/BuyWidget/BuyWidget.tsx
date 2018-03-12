@@ -27,11 +27,11 @@ import * as ReactDOM from 'react-dom';
 import * as Web3 from 'web3';
 import * as Web3ProviderEngine from 'web3-provider-engine';
 
-import { artifacts } from '..//artifacts';
-import { ForwarderWrapper } from '../contract_wrappers/forwarder_wrapper';
+import { artifacts } from '../../artifacts';
+import { ForwarderWrapper } from '../../contract_wrappers/forwarder_wrapper';
 
-import { AccountBlockie } from './AccountBlockie';
-import { TokenSelector } from './TokenSelector';
+import AccountBlockie from '../AccountBlockie';
+import TokenSelector from '../TokenSelector';
 
 const TEST_NETWORK_ID = 50;
 const TEST_RPC = 'http://127.0.0.1:8545';

@@ -45,7 +45,9 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
     "generate_contract_wrappers": "node ../abi-gen/lib/index.js --abis 'src/artifacts/@(Forwarder).json' --template ../0x.js/contract_templates/contract.handlebars --partials '../0x.js/contract_templates/partials/**/*.handlebars' --output src/contract_wrappers/generated",
-    "update_contracts": "for i in ${npm_package_config_artifacts}; do copyfiles -u 3 ../contracts/artifacts/$i.json ../forwarder-widget/src/artifacts; done;"
+    "update_contracts": "for i in ${npm_package_config_artifacts}; do copyfiles -u 3 ../contracts/artifacts/$i.json ../forwarder-widget/src/artifacts; done;",
+    "styleguide": "styleguidist server",
+    "styleguide:build": "styleguidist build"
   },
   "config": {
     "artifacts": "Forwarder TokenTransferProxy Exchange TokenRegistry Token EtherToken ZRXToken WETH9"
@@ -68,6 +70,9 @@
     "lodash": "^4.17.5",
     "prop-types": "^15.6.1",
     "react": "^16.2.0",
+    "react-docgen-typescript": "^1.2.5",
+    "react-scripts-ts": "^2.13.0",
+    "react-styleguidist": "^6.2.7",
     "tslint": "^5.9.1",
     "typescript": "^2.7.2",
     "web3": "^0.20.0",

@@ -20,7 +20,9 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { definedTokensToIcon, TokenSelectorItem } from './TokenSelectorItem';
+import TokenSelectorItem from '../TokenSelectorItem';
+
+import { definedTokensToIcon } from '../TokenSelectorItem/TokenSelectorItem';
 
 interface TokenSelectorPropTypes {
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;

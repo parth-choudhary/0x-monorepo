@@ -20,7 +20,7 @@ import * as ReactDOM from 'react-dom';
 
 import './index.css';
 
-import { BuyWidget } from './components/BuyWidget';
+import BuyWidget from './components/BuyWidget';
 import registerServiceWorker from './registerServiceWorker';
 
 import './App.css';
