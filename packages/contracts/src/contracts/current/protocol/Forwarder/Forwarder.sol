@@ -12,11 +12,6 @@ contract Forwarder is SafeMath {
     Token zrxToken;
 
     uint256 constant MAX_UINT = 2 ** 256 - 1;
-        // Error Codes
-    enum Errors {
-        INSUFFICIENT_ETHER_VALUE,
-        UNSUPPORTED_TOKEN_PAIR
-    }
 
     event LogForwarderError(uint8 indexed errorId);
 
@@ -53,10 +48,7 @@ contract Forwarder is SafeMath {
         assert(msg.value > 0);
         assert(orderAddresses[3] == address(etherToken));
 
-        // Set approval incase this is not WETH/ZRX
-        require(Token(orderAddresses[2]).approve(address(tokenProxy), MAX_UINT));
-
-        EtherToken(etherToken).deposit.value(msg.value)();
+        etherToken.deposit.value(msg.value)();
 
         require(Exchange(exchange).fillOrder(
             orderAddresses,
