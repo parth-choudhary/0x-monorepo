@@ -1,3 +1,6 @@
+declare module 'web3-provider-engine';
+declare module 'web3-provider-engine/subproviders/rpc';
+
 // tslint:disable:completed-docs
 declare module 'solidity-parser-antlr' {
     export interface BaseASTNode {

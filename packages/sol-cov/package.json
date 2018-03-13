@@ -30,7 +30,8 @@
         "solidity-coverage": "^0.4.10",
         "solidity-parser-antlr": "^0.2.7",
         "solidity-parser-sc": "^0.4.4",
-        "web3": "^0.20.0"
+        "web3": "^0.20.0",
+        "web3-provider-engine": "^13.0.1"
     },
     "devDependencies": {
         "@0xproject/tslint-config": "^0.4.9",
