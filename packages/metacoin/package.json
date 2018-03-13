@@ -1,7 +1,11 @@
 {
-  "name": "metacoin",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "Apache-2.0",
-  "private": false
+    "name": "metacoin",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "@0xproject/sol-cov": "^0.0.1",
+        "web3-provider-engine": "^13.0.1"
+    },
+    "private": false
 }
