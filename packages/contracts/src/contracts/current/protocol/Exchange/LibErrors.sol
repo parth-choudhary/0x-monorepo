@@ -1,6 +1,6 @@
 /*
 
-  Copyright 2017 ZeroEx Intl.
+  Copyright 2018 ZeroEx Intl.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 
 */
 
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.21;
+pragma experimental ABIEncoderV2;
 
 contract LibErrors {
-  
+
     // Error Codes
     enum Errors {
         ORDER_EXPIRED,                    // Order has already expired
@@ -27,7 +28,7 @@ contract LibErrors {
         ROUNDING_ERROR_TOO_LARGE,         // Rounding error too large
         INSUFFICIENT_BALANCE_OR_ALLOWANCE // Insufficient balance or allowance for token transfer
     }
-    
+
     event LogError(uint8 indexed errorId, bytes32 indexed orderHash);
 
 }

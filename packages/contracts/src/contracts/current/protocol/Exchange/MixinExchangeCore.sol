@@ -1,6 +1,6 @@
 /*
 
-  Copyright 2017 ZeroEx Intl.
+  Copyright 2018 ZeroEx Intl.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 */
 
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.21;
+pragma experimental ABIEncoderV2;
 
 import "./mixins/MExchangeCore.sol";
 import "./mixins/MSettlement.sol";
@@ -41,25 +42,25 @@ contract MixinExchangeCore is
     // Mappings of orderHash => amounts of takerTokenAmount filled or cancelled.
     mapping (bytes32 => uint256) public filled;
     mapping (bytes32 => uint256) public cancelled;
-    
+
     event LogFill(
-        address indexed maker,
-        address taker,
-        address indexed feeRecipient,
-        address makerToken,
-        address takerToken,
+        address indexed makerAddress,
+        address takerAddress,
+        address indexed feeRecipientAddress,
+        address makerTokenAddress,
+        address takerTokenAddress,
         uint256 makerTokenFilledAmount,
         uint256 takerTokenFilledAmount,
-        uint256 makerFeePaid,
-        uint256 takerFeePaid,
+        uint256 makerFeeAmountPaid,
+        uint256 takerFeeAmountPaid,
         bytes32 indexed orderHash
     );
 
     event LogCancel(
-        address indexed maker,
-        address indexed feeRecipient,
-        address makerToken,
-        address takerToken,
+        address indexed makerAddress,
+        address indexed feeRecipientAddress,
+        address makerTokenAddress,
+        address takerTokenAddress,
         uint256 makerTokenCancelledAmount,
         uint256 takerTokenCancelledAmount,
         bytes32 indexed orderHash
@@ -70,147 +71,118 @@ contract MixinExchangeCore is
     */
 
     /// @dev Fills the input order.
-    /// @param orderAddresses Array of order's maker, taker, makerToken, takerToken, and feeRecipient.
-    /// @param orderValues Array of order's makerTokenAmount, takerTokenAmount, makerFee, takerFee, expirationTimestampInSec, and salt.
+    /// @param order Order struct containing order specifications.
     /// @param takerTokenFillAmount Desired amount of takerToken to fill.
     /// @param signature Proof of signing order by maker.
     /// @return Total amount of takerToken filled in trade.
     function fillOrder(
-        address[5] orderAddresses,
-        uint[6] orderValues,
-        uint takerTokenFillAmount,
+        Order order,
+        uint256 takerTokenFillAmount,
         bytes signature)
         public
         returns (uint256 takerTokenFilledAmount)
     {
-        Order memory order = Order({
-            maker: orderAddresses[0],
-            taker: orderAddresses[1],
-            makerToken: orderAddresses[2],
-            takerToken: orderAddresses[3],
-            feeRecipient: orderAddresses[4],
-            makerTokenAmount: orderValues[0],
-            takerTokenAmount: orderValues[1],
-            makerFee: orderValues[2],
-            takerFee: orderValues[3],
-            expirationTimestampInSec: orderValues[4],
-            orderHash: getOrderHash(orderAddresses, orderValues)
-        });
-        
+        // Compute the order hash
+        bytes32 orderHash = getOrderHash(order);
+
         // Validate order and maker only if first time seen
         // TODO: Read filled and cancelled only once
-        if (filled[order.orderHash] == 0 && cancelled[order.orderHash] == 0) {
+        if (filled[orderHash] == 0 && cancelled[orderHash] == 0) {
             require(order.makerTokenAmount > 0);
             require(order.takerTokenAmount > 0);
-            require(isValidSignature(
-                keccak256(orderSchemaHash, order.orderHash),
-                order.maker,
-                signature
-            ));
+            require(isValidSignature(orderHash, order.makerAddress, signature));
         }
-        
+
         // Validate taker
-        if (order.taker != address(0)) {
-            require(order.taker == msg.sender);
+        if (order.takerAddress != address(0)) {
+            require(order.takerAddress == msg.sender);
         }
         require(takerTokenFillAmount > 0);
 
         // Validate order expiration
-        if (block.timestamp >= order.expirationTimestampInSec) {
-            LogError(uint8(Errors.ORDER_EXPIRED), order.orderHash);
+        if (block.timestamp >= order.expirationTimeSeconds) {
+            LogError(uint8(Errors.ORDER_EXPIRED), orderHash);
             return 0;
         }
-        
+
         // Validate order availability
-        uint256 remainingTakerTokenAmount = safeSub(order.takerTokenAmount, getUnavailableTakerTokenAmount(order.orderHash));
+        uint256 remainingTakerTokenAmount = safeSub(order.takerTokenAmount, getUnavailableTakerTokenAmount(orderHash));
         takerTokenFilledAmount = min256(takerTokenFillAmount, remainingTakerTokenAmount);
         if (takerTokenFilledAmount == 0) {
-            LogError(uint8(Errors.ORDER_FULLY_FILLED_OR_CANCELLED), order.orderHash);
+            LogError(uint8(Errors.ORDER_FULLY_FILLED_OR_CANCELLED), orderHash);
             return 0;
         }
-        
+
         // Validate fill order rounding
         if (isRoundingError(takerTokenFilledAmount, order.takerTokenAmount, order.makerTokenAmount)) {
-            LogError(uint8(Errors.ROUNDING_ERROR_TOO_LARGE), order.orderHash);
+            LogError(uint8(Errors.ROUNDING_ERROR_TOO_LARGE), orderHash);
             return 0;
         }
 
         // Update state
-        filled[order.orderHash] = safeAdd(filled[order.orderHash], takerTokenFilledAmount);
-        
+        filled[orderHash] = safeAdd(filled[orderHash], takerTokenFilledAmount);
+
         // Settle order
-        var (makerTokenFilledAmount, makerFeePaid, takerFeePaid) =
+        var (makerTokenFilledAmount, makerFeeAmountPaid, takerFeeAmountPaid) =
             settleOrder(order, msg.sender, takerTokenFilledAmount);
-        
+
         // Log order
         LogFill(
-            order.maker,
+            order.makerAddress,
             msg.sender,
-            order.feeRecipient,
-            order.makerToken,
-            order.takerToken,
+            order.feeRecipientAddress,
+            order.makerTokenAddress,
+            order.takerTokenAddress,
             makerTokenFilledAmount,
             takerTokenFilledAmount,
-            makerFeePaid,
-            takerFeePaid,
-            order.orderHash
+            makerFeeAmountPaid,
+            takerFeeAmountPaid,
+            orderHash
         );
         return takerTokenFilledAmount;
     }
 
     /// @dev Cancels the input order.
-    /// @param orderAddresses Array of order's maker, taker, makerToken, takerToken, and feeRecipient.
-    /// @param orderValues Array of order's makerTokenAmount, takerTokenAmount, makerFee, takerFee, expirationTimestampInSec, and salt.
+    /// @param order Order struct containing order specifications.
     /// @param takerTokenCancelAmount Desired amount of takerToken to cancel in order.
     /// @return Amount of takerToken cancelled.
     function cancelOrder(
-        address[5] orderAddresses,
-        uint256[6] orderValues,
+        Order order,
         uint256 takerTokenCancelAmount)
         public
         returns (uint256 takerTokenCancelledAmount)
     {
-        Order memory order = Order({
-            maker: orderAddresses[0],
-            taker: orderAddresses[1],
-            makerToken: orderAddresses[2],
-            takerToken: orderAddresses[3],
-            feeRecipient: orderAddresses[4],
-            makerTokenAmount: orderValues[0],
-            takerTokenAmount: orderValues[1],
-            makerFee: orderValues[2],
-            takerFee: orderValues[3],
-            expirationTimestampInSec: orderValues[4],
-            orderHash: getOrderHash(orderAddresses, orderValues)
-        });
-
+        // Compute the order hash
+        bytes32 orderHash = getOrderHash(order);
+        
+        // Validate the order
         require(order.makerTokenAmount > 0);
         require(order.takerTokenAmount > 0);
         require(takerTokenCancelAmount > 0);
-        require(order.maker == msg.sender);
+        require(order.makerAddress == msg.sender);
 
-        if (block.timestamp >= order.expirationTimestampInSec) {
-            LogError(uint8(Errors.ORDER_EXPIRED), order.orderHash);
+        if (block.timestamp >= order.expirationTimeSeconds) {
+            LogError(uint8(Errors.ORDER_EXPIRED), orderHash);
             return 0;
         }
 
-        uint256 remainingTakerTokenAmount = safeSub(order.takerTokenAmount, getUnavailableTakerTokenAmount(order.orderHash));
+        uint256 remainingTakerTokenAmount = safeSub(order.takerTokenAmount, getUnavailableTakerTokenAmount(orderHash));
         takerTokenCancelledAmount = min256(takerTokenCancelAmount, remainingTakerTokenAmount);
         if (takerTokenCancelledAmount == 0) {
-            LogError(uint8(Errors.ORDER_FULLY_FILLED_OR_CANCELLED), order.orderHash);
+            LogError(uint8(Errors.ORDER_FULLY_FILLED_OR_CANCELLED), orderHash);
             return 0;
         }
 
-        cancelled[order.orderHash] = safeAdd(cancelled[order.orderHash], takerTokenCancelledAmount);
+        cancelled[orderHash] = safeAdd(cancelled[orderHash], takerTokenCancelledAmount);
 
         LogCancel(
-            order.maker,
-            order.feeRecipient,
-            order.makerToken,
-            order.takerToken,
+            order.makerAddress,
+            order.feeRecipientAddress,
+            order.makerTokenAddress,
+            order.takerTokenAddress,
             getPartialAmount(takerTokenCancelledAmount, order.takerTokenAmount, order.makerTokenAmount),
             takerTokenCancelledAmount,
-            order.orderHash
+            orderHash
         );
         return takerTokenCancelledAmount;
     }
@@ -225,7 +197,9 @@ contract MixinExchangeCore is
         returns (bool isError)
     {
         uint256 remainder = mulmod(target, numerator, denominator);
-        if (remainder == 0) return false; // No rounding error.
+        if (remainder == 0) {
+            return false; // No rounding error.
+        }
 
         uint256 errPercentageTimes1000000 = safeDiv(
             safeMul(remainder, 1000000),

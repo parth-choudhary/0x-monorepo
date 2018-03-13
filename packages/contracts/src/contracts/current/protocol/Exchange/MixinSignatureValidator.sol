@@ -1,6 +1,6 @@
 /*
 
-  Copyright 2017 ZeroEx Intl.
+  Copyright 2018 ZeroEx Intl.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 */
 
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.21;
+pragma experimental ABIEncoderV2;
 
 import "./mixins/MSignatureValidator.sol";
 import "./ISigner.sol";
@@ -34,7 +35,7 @@ contract MixinSignatureValidator is
         Trezor,
         Contract
     }
-  
+
     function isValidSignature(
         bytes32 hash,
         address signer,
@@ -43,16 +44,16 @@ contract MixinSignatureValidator is
         returns (bool isValid)
     {
         // TODO: Domain separation: make hash depend on role. (Taker sig should not be valid as maker sig, etc.)
-        
+
         require(signature.length >= 1);
         SignatureType signatureType = SignatureType(uint8(signature[0]));
-        
+
         // Variables are not scoped in Solidity
         uint8 v;
         bytes32 r;
         bytes32 s;
         address recovered;
-        
+
         // Always illegal signature
         // This is always an implicit option since a signer can create a
         // signature array with invalid type or length. We may as well make
@@ -60,7 +61,7 @@ contract MixinSignatureValidator is
         // also the initialization value for the enum type.
         if (signatureType == SignatureType.Illegal) {
             revert();
-        
+
         // Always invalid signature
         // Like Illegal, this is always implicitly available and therefore
         // offered explicitly. It can be implicitly created by providing
@@ -69,7 +70,7 @@ contract MixinSignatureValidator is
             require(signature.length == 1);
             isValid = false;
             return isValid;
-        
+
         // Implicitly signed by caller
         // The signer has initiated the call. In the case of non-contract
         // accounts it means the transaction itself was signed.
@@ -82,7 +83,7 @@ contract MixinSignatureValidator is
             require(signature.length == 1);
             isValid = signer == msg.sender;
             return isValid;
-        
+
         // Signed using web3.eth_sign
         } else if (signatureType == SignatureType.Ecrecover) {
             require(signature.length == 66);
@@ -97,7 +98,7 @@ contract MixinSignatureValidator is
             );
             isValid = signer == recovered;
             return isValid;
-        
+
         // Signature using EIP712
         } else if (signatureType == SignatureType.EIP712) {
             require(signature.length == 66);
@@ -107,7 +108,7 @@ contract MixinSignatureValidator is
             recovered = ecrecover(hash, v, r, s);
             isValid = signer == recovered;
             return isValid;
-        
+
         // Signature from Trezor hardware wallet
         // It differs from web3.eth_sign in the encoding of message length
         // (Bitcoin varint encoding vs ascii-decimal, the latter is not
@@ -129,13 +130,13 @@ contract MixinSignatureValidator is
             );
             isValid = signer == recovered;
             return isValid;
-        
+
         // Signature verified by signer contract
         } else if (signatureType == SignatureType.Contract) {
             isValid = ISigner(signer).isValidSignature(hash, signature);
             return isValid;
         }
-        
+
         // Anything else is illegal (We do not return false because
         // the signature may actually be valid, just not in a format
         // that we currently support. In this case returning false
@@ -143,16 +144,16 @@ contract MixinSignatureValidator is
         // signature was invalid.)
         revert();
     }
-    
+
     function get32(bytes b, uint256 index)
         private pure
         returns (bytes32 result)
     {
         require(b.length >= index + 32);
-        
+
         // Arrays are prefixed by a 256 bit length parameter
         index += 32;
-        
+
         // Read the bytes32 from array memory
         assembly {
             result := mload(add(b, index))

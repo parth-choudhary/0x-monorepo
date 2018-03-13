@@ -1,6 +1,6 @@
 /*
 
-  Copyright 2017 ZeroEx Intl.
+  Copyright 2018 ZeroEx Intl.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 */
 
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.21;
+pragma experimental ABIEncoderV2;
 
 import "../LibOrder.sol";
 
 contract MSettlement is LibOrder {
-  
+
     function settleOrder(
         Order order,
         address taker,
@@ -29,8 +30,8 @@ contract MSettlement is LibOrder {
         internal
         returns (
             uint256 makerTokenFilledAmount,
-            uint256 makerFeePaid,
-            uint256 takerFeePaid
+            uint256 makerFeeAmountPaid,
+            uint256 takerFeeAmountPaid
         );
 
 }

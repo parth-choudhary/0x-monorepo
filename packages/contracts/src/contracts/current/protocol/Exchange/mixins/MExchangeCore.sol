@@ -1,6 +1,6 @@
 /*
 
-  Copyright 2017 ZeroEx Intl.
+  Copyright 2018 ZeroEx Intl.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -16,21 +16,22 @@
 
 */
 
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.21;
+pragma experimental ABIEncoderV2;
 
-contract MExchangeCore {
-    
+import "../LibOrder.sol";
+
+contract MExchangeCore is LibOrder {
+
     function fillOrder(
-          address[5] orderAddresses,
-          uint256[6] orderValues,
-          uint256 takerTokenFillAmount,
-          bytes signature)
-          public
-          returns (uint256 takerTokenFilledAmount);
+        Order order,
+        uint256 takerTokenFillAmount,
+        bytes signature)
+        public
+        returns (uint256 takerTokenFilledAmount);
 
     function cancelOrder(
-        address[5] orderAddresses,
-        uint256[6] orderValues,
+        Order order,
         uint256 takerTokenCancelAmount)
         public
         returns (uint256 takerTokenCancelledAmount);
