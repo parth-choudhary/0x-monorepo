@@ -7,6 +7,7 @@ import * as yargs from 'yargs';
 
 import { commands } from './commands';
 import { constants } from './utils/constants';
+import { consoleReporter } from './utils/error_reporter';
 import { CliOptions, CompilerOptions, DeployerOptions } from './utils/types';
 
 const DEFAULT_OPTIMIZER_ENABLED = false;
@@ -139,12 +140,12 @@ function deployCommandBuilder(yargsInstance: any) {
             default: DEFAULT_CONTRACTS_LIST,
             description: 'comma separated list of contracts to compile',
         })
-        .command('compile', 'compile contracts', identityCommandBuilder, onCompileCommandAsync)
+        .command('compile', 'compile contracts', identityCommandBuilder, consoleReporter(onCompileCommandAsync))
         .command(
             'deploy',
             'deploy a single contract with provided arguments',
             deployCommandBuilder,
-            onDeployCommandAsync,
+            consoleReporter(onDeployCommandAsync),
         )
         .help().argv;
 })();
